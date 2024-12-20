@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface TimeInputProps {
   hours: number;
   minutes: number;
@@ -8,11 +6,20 @@ interface TimeInputProps {
   disabled?: boolean;
 }
 
-export function TimeInput({ hours, minutes, seconds, onChange, disabled }: TimeInputProps) {
-  const handleChange = (field: 'hours' | 'minutes' | 'seconds', value: string) => {
+export function TimeInput({
+  hours,
+  minutes,
+  seconds,
+  onChange,
+  disabled,
+}: TimeInputProps) {
+  const handleChange = (
+    field: 'hours' | 'minutes' | 'seconds',
+    value: string,
+  ) => {
     const numValue = Math.max(0, parseInt(value) || 0);
     const clampedValue = field === 'hours' ? numValue : Math.min(numValue, 59);
-    
+
     switch (field) {
       case 'hours':
         onChange(clampedValue, minutes, seconds);
@@ -30,6 +37,7 @@ export function TimeInput({ hours, minutes, seconds, onChange, disabled }: TimeI
     <div className="flex gap-2 justify-center items-center">
       <div className="flex flex-col items-center">
         <input
+          aria-label="Hours"
           type="number"
           min="0"
           value={hours}
@@ -42,6 +50,7 @@ export function TimeInput({ hours, minutes, seconds, onChange, disabled }: TimeI
       <span className="text-2xl">:</span>
       <div className="flex flex-col items-center">
         <input
+          aria-label="Minutes"
           type="number"
           min="0"
           max="59"
@@ -55,6 +64,7 @@ export function TimeInput({ hours, minutes, seconds, onChange, disabled }: TimeI
       <span className="text-2xl">:</span>
       <div className="flex flex-col items-center">
         <input
+          aria-label="Seconds"
           type="number"
           min="0"
           max="59"

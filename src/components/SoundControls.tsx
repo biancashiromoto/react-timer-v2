@@ -1,4 +1,3 @@
-import React from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 
 interface SoundControlsProps {
@@ -8,10 +7,17 @@ interface SoundControlsProps {
   onMuteToggle: () => void;
 }
 
-export function SoundControls({ volume, isMuted, onVolumeChange, onMuteToggle }: SoundControlsProps) {
+export function SoundControls({
+  volume,
+  isMuted,
+  onVolumeChange,
+  onMuteToggle,
+}: SoundControlsProps) {
   return (
     <div className="flex items-center gap-2 mt-4 justify-center">
       <button
+        type="button"
+        aria-label={isMuted ? 'Unmute' : 'Mute'}
         onClick={onMuteToggle}
         className={`p-2 rounded-lg ${
           isMuted ? 'bg-gray-200' : 'bg-blue-100'
@@ -20,6 +26,7 @@ export function SoundControls({ volume, isMuted, onVolumeChange, onMuteToggle }:
         {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
       </button>
       <input
+        aria-label="Change volume"
         type="range"
         min="0"
         max="100"
