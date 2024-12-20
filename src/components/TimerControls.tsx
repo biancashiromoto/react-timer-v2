@@ -1,23 +1,47 @@
-import React from 'react';
-import { Play, Square, RefreshCw, Plus } from 'lucide-react';
+import { Play, Pause, Square, RefreshCw, Plus } from 'lucide-react';
+import { Dispatch, SetStateAction } from 'react';
 
 interface TimerControlsProps {
   isRunning: boolean;
+  isFinished: boolean;
   onToggle: () => void;
   onReset: () => void;
+  stopTimer: () => void;
   onAddTime: (minutes: number) => void;
+  hasManuallyStopped: boolean,
+  setHasManuallyStopped: Dispatch<SetStateAction<boolean>>;
 }
 
-export function TimerControls({ isRunning, onToggle, onReset, onAddTime }: TimerControlsProps) {
+export function TimerControls({
+  isRunning,
+  isFinished,
+  onToggle,
+  onReset,
+  onAddTime,
+  setHasManuallyStopped
+}: TimerControlsProps) {
+  let buttonIcon, buttonText;
+
+  if (isRunning) {
+    buttonIcon = <Pause size={20} />;
+    buttonText = 'Pause';
+  } else if (isFinished) {
+    buttonIcon = <Square size={20} />;
+    buttonText = 'Stop';
+  } else {
+    buttonIcon = <Play size={20} />; 
+    buttonText = 'Start';
+  }
+
   return (
     <>
       <div className="flex justify-center gap-2 my-4">
         <button
-          onClick={onToggle}
+          onClick={() => isFinished ? setHasManuallyStopped(true) : onToggle()}
           className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center gap-2"
         >
-          {isRunning ? <Square size={20} /> : <Play size={20} />}
-          {isRunning ? 'Stop' : 'Start'}
+          {buttonIcon}
+          {buttonText}
         </button>
         <button
           onClick={onReset}

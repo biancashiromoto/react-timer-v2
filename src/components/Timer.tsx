@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useState, useEffect, useRef } from 'react';
 import { getTotalSeconds, getTimeValues } from '../utils/time';
 import { TimerHeader } from './TimerHeader';
 import { TimeDisplay } from './TimeDisplay';
@@ -19,6 +20,7 @@ export function Timer({ title, onTitleChange, onDelete }: TimerProps) {
   const [volume, setVolume] = useState(50);
   const [isMuted, setIsMuted] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
+  const [hasManuallyStopped, setHasManuallyStopped] = useState(false);
   const timerSoundRef = useRef(new TimerSound());
 
   useEffect(() => {
@@ -52,14 +54,21 @@ export function Timer({ title, onTitleChange, onDelete }: TimerProps) {
     timerSoundRef.current.isMuted = isMuted;
   }, [isMuted]);
 
+  useEffect(() => {
+    if (hasManuallyStopped) stopTimer();
+  }, [hasManuallyStopped]);
+
   const { hours, minutes, seconds } = getTimeValues(totalSeconds);
 
-  const handleTimeChange = (field: 'hours' | 'minutes' | 'seconds', value: string) => {
+  const handleTimeChange = (
+    field: 'hours' | 'minutes' | 'seconds',
+    value: string,
+  ) => {
     if (isRunning) return;
 
     const numValue = Math.max(0, parseInt(value) || 0);
     const currentValues = getTimeValues(totalSeconds);
-    let newValues = { ...currentValues };
+    const newValues = { ...currentValues };
 
     if (field === 'hours') {
       newValues.hours = numValue;
@@ -70,7 +79,7 @@ export function Timer({ title, onTitleChange, onDelete }: TimerProps) {
     const newTotalSeconds = getTotalSeconds(
       newValues.hours,
       newValues.minutes,
-      newValues.seconds
+      newValues.seconds,
     );
     setTotalSeconds(newTotalSeconds);
     setInitialSeconds(newTotalSeconds);
@@ -87,14 +96,25 @@ export function Timer({ title, onTitleChange, onDelete }: TimerProps) {
   };
 
   const toggleTimer = () => {
-    if (totalSeconds === 0 && !isRunning) {
-      return;
-    }
-    setIsRunning(!isRunning);
     if (isFinished) {
       timerSoundRef.current.stop();
       setIsFinished(false);
+      setTotalSeconds(initialSeconds);
+      setIsRunning(true);
+    } else if (isRunning) {
+      setIsRunning(false);
+    } else if (totalSeconds > 0) {
+      setIsRunning(true);
     }
+  };
+
+  const stopTimer = () => {
+    setIsRunning(false);
+    setTotalSeconds(initialSeconds);
+    timerSoundRef.current.stop();
+    setIsFinished(true);
+    setHasManuallyStopped(false);
+    setIsFinished(false);
   };
 
   const resetTimer = () => {
@@ -102,13 +122,16 @@ export function Timer({ title, onTitleChange, onDelete }: TimerProps) {
     setTotalSeconds(initialSeconds);
     timerSoundRef.current.stop();
     setIsFinished(false);
+    setIsRunning(true);
   };
 
   return (
-    <div className={`bg-white rounded-lg shadow-md p-6 mb-4 transition-all ${
-      isFinished ? 'animate-[pulse-blue_2s_ease-in-out_infinite]' : ''
-    }`}>
-      <TimerHeader 
+    <div
+      className={`bg-white rounded-lg shadow-md p-6 mb-4 transition-all ${
+        isFinished ? 'animate-[pulse-blue_2s_ease-in-out_infinite]' : ''
+      }`}
+    >
+      <TimerHeader
         title={title}
         onTitleChange={onTitleChange}
         onDelete={onDelete}
@@ -121,10 +144,14 @@ export function Timer({ title, onTitleChange, onDelete }: TimerProps) {
         isRunning={isRunning}
       />
       <TimerControls
+        stopTimer={stopTimer}
+        isFinished={isFinished}
         isRunning={isRunning}
         onToggle={toggleTimer}
         onReset={resetTimer}
         onAddTime={addTime}
+        hasManuallyStopped={hasManuallyStopped}
+        setHasManuallyStopped={setHasManuallyStopped}
       />
       <SoundControls
         volume={volume}
