@@ -1,10 +1,12 @@
+import sound from '../chill-guy.mp3';
+
 export class TimerSound {
   private audio: HTMLAudioElement;
   private _volume: number = 50;
   private _isMuted: boolean = false;
 
   constructor() {
-    this.audio = new Audio('/src/chill-guy.mp3');
+    this.audio = new Audio(sound);
     this.audio.loop = true;
     this.updateVolume();
   }
