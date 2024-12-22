@@ -22,7 +22,7 @@ export function TimerHeader({
       />
 
       <button
-        aria-label="Remove"
+        aria-label="Delete timer"
         type="button"
         onClick={onDelete}
         className="text-red-500 hover:text-red-700 text-sm"
