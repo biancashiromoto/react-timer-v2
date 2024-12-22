@@ -5,6 +5,7 @@ import { TimeDisplay } from './TimeDisplay';
 import { TimerControls } from './TimerControls';
 import { SoundControls } from './SoundControls';
 import { useTimer } from '../contexts/TimerContext';
+import { TimerSound } from '../utils/sound';
 
 interface TimerProps {
   timer: {
@@ -16,6 +17,8 @@ interface TimerProps {
     hasManuallyStopped: boolean;
     volume: number;
     isMuted: boolean;
+    initialSeconds: number;
+    sound: TimerSound;
   };
 }
 
@@ -41,8 +44,6 @@ export function Timer({ timer }: TimerProps) {
     field: 'hours' | 'minutes' | 'seconds',
     value: string,
   ) => {
-    if (timer.isRunning) return;
-
     const numValue = Math.max(0, parseInt(value) || 0);
     const currentValues = getTimeValues(timer.totalSeconds);
     const newValues = { ...currentValues };
@@ -61,6 +62,7 @@ export function Timer({ timer }: TimerProps) {
     
     dispatch({ type: 'SET_TIMER_SECONDS', id: timer.id, totalSeconds: newTotalSeconds });
   };
+
 
   return (
     <div
@@ -89,9 +91,8 @@ export function Timer({ timer }: TimerProps) {
         onReset={() => dispatch({ type: 'RESET_TIMER', id: timer.id })}
         onAddTime={(minutes) => dispatch({ type: 'ADD_TIME', id: timer.id, minutes })}
         hasManuallyStopped={timer.hasManuallyStopped}
-        setHasManuallyStopped={(stopped) => 
-          dispatch({ type: 'SET_MANUALLY_STOPPED', id: timer.id, stopped })
-        }
+        stopTimer={() => dispatch({ type: 'STOP_TIMER', id: timer.id })}
+        timer={timer}
       />
       <SoundControls
         volume={timer.volume}
